@@ -1,0 +1,55 @@
+pip install cryptography
+from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
+from cryptography.hazmat.backends import default_backend
+from cryptography.hazmat.primitives import padding
+import os
+
+# Function to encrypt plaintext
+def aes_encrypt(key, plaintext):
+    # Generate a random 16-byte IV
+    iv = os.urandom(16)
+    
+    # Create a Cipher object
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    encryptor = cipher.encryptor()
+    
+    # Pad plaintext to be a multiple of the block size
+    padder = padding.PKCS7(algorithms.AES.block_size).padder()
+    padded_data = padder.update(plaintext) + padder.finalize()
+    
+    # Encrypt the padded data
+    ciphertext = encryptor.update(padded_data) + encryptor.finalize()
+    
+    return iv + ciphertext  # Prepend IV for use in decryption
+
+# Function to decrypt ciphertext
+def aes_decrypt(key, ciphertext):
+    # Extract the IV from the beginning
+    iv = ciphertext[:16]
+    actual_ciphertext = ciphertext[16:]
+    
+    # Create a Cipher object
+    cipher = Cipher(algorithms.AES(key), modes.CBC(iv), backend=default_backend())
+    decryptor = cipher.decryptor()
+    
+    # Decrypt the data
+    padded_data = decryptor.update(actual_ciphertext) + decryptor.finalize()
+    
+    # Unpad the decrypted data
+    unpadder = padding.PKCS7(algorithms.AES.block_size).unpadder()
+    plaintext = unpadder.update(padded_data) + unpadder.finalize()
+    
+    return plaintext
+
+# Example usage
+if _name_ == "_main_":
+    # Key must be either 16, 24, or 32 bytes long
+    key = os.urandom(32)  # Generate a random key (256 bits)
+    plaintext = b"Hello, this is a secret message."
+
+    # Encrypt the plaintext
+    ciphertext = aes_encrypt(key, plaintext)
+    print("Ciphertext:", ciphertext)
+    # Decrypt the ciphertext
+    decrypted_text = aes_decrypt(key, ciphertext)
+    print("Decrypted text:", decrypted_text)
