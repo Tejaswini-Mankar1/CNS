@@ -1,0 +1,29 @@
+from Crypto.Cipher import Blowfish
+from Crypto.Util.Padding import pad, unpad
+import base64
+
+# Function to encrypt data
+def encrypt_blowfish(key, data):
+    cipher = Blowfish.new(key, Blowfish.MODE_ECB)
+    padded_data = pad(data.encode(), Blowfish.block_size)
+    encrypted_data = cipher.encrypt(padded_data)
+    return base64.b64encode(encrypted_data).decode()
+
+# Function to decrypt data
+def decrypt_blowfish(key, encrypted_data):
+    cipher = Blowfish.new(key, Blowfish.MODE_ECB)
+    encrypted_data_bytes = base64.b64decode(encrypted_data)
+    decrypted_data = unpad(cipher.decrypt(encrypted_data_bytes), Blowfish.block_size)
+    return decrypted_data.decode()
+
+# Example usage
+key = b'YourKey12345678'  # The key must be a byte string, with a length between 4 and 56 bytes
+data = "This is some data to encrypt."
+
+# Encrypt
+encrypted = encrypt_blowfish(key, data)
+print(f"Encrypted: {encrypted}")
+
+# Decrypt
+decrypted = decrypt_blowfish(key, encrypted)
+print(f"Decrypted: {decrypted}")
