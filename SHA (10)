@@ -1,0 +1,22 @@
+import hashlib
+
+# Function to hash a message using SHA-1
+def hash_message_sha1(message):
+    # Convert the message to bytes
+    message_bytes = message.encode('utf-8')
+
+    # Create a new SHA-1 hash object
+    hasher = hashlib.sha1()
+
+    # Update the hash object with the bytes of the message
+    hasher.update(message_bytes)
+
+    # Get the hexadecimal representation of the digest
+    return hasher.hexdigest()
+
+# Example usage
+message = "This is the message to be hashed."
+
+# Hash using SHA-1
+hashed_message = hash_message_sha1(message)
+print(f"SHA-1 Hash: {hashed_message}")
