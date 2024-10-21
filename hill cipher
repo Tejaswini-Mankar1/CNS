@@ -1,0 +1,42 @@
+# To implement hill cipher for encryption and decryption
+import numpy as np
+def encrypt(plaintext, key):
+    plaintext = "".join([c for c in plaintext.upper() if c.isalpha()]
+    while len(plaintext) % len(key) != 0:
+        plaintext += 'X'
+    plaintext_nums = [ord(c) - 65 for c in plaintext]
+    ciphertext = ""
+    for i in range(0, len(plaintext_nums), len(key)):
+        block = plaintext_nums[i:i+len(key)]
+        block = np.array(block).reshape(-1, 1)
+        encrypted_block = np.dot(key, block) % 26
+        ciphertext += "".join([chr(x + 65) for x in encrypted_block.flatten()])
+
+    return ciphertext
+
+def decrypt(ciphertext, key):
+        key_inv = np.linalg.inv(key)
+    det = round(np.linalg.det(key))
+    det_inv = 0
+    for i in range(26):
+        if (det * i) % 26 == 1:
+            det_inv = i
+            break
+    key_inv = (det_inv * np.round(key_inv * det) % 26).astype(int)
+    ciphertext_nums = [ord(c) - 65 for c in ciphertext]
+    plaintext = ""
+    for i in range(0, len(ciphertext_nums), len(key)):
+        block = ciphertext_nums[i:i+len(key)]
+        block = np.array(block).reshape(-1, 1)
+        decrypted_block = np.dot(key_inv, block) % 26
+        plaintext += "".join([chr(x + 65) for x in decrypted_block.flatten()])
+    return plaintext
+# Example Usage
+key = np.array([[17, 17, 5], [21, 18, 21], [2, 2, 19]])
+plaintext = "HELLO WORLD"
+encrypted_text = encrypt(plaintext, key)
+decrypted_text = decrypt(encrypted_text, key)
+
+print("Plaintext:", plaintext)
+print("Encrypted:", encrypted_text)
+print("Decrypted:", decrypted_text)
