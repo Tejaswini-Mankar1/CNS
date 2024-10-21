@@ -1,0 +1,45 @@
+import random
+
+def generate_prime_and_base():
+    # A small prime number and a base (generator)
+    prime = 23  # A small prime for demonstration
+    base = 5    # A primitive root modulo 23
+    return prime, base
+
+def generate_private_key(prime):
+    # Generate a private key
+    return random.randint(1, prime - 1)
+
+def compute_public_key(private_key, base, prime):
+    # Compute public key: (base^private_key) mod prime
+    return pow(base, private_key, prime)
+
+def compute_shared_secret(public_key, private_key, prime):
+    # Compute shared secret: (public_key^private_key) mod prime
+    return pow(public_key, private_key, prime)
+
+if _name_ == "_main_":
+    # Step 1: Generate a prime number and base
+    prime, base = generate_prime_and_base()
+    print(f"Prime: {prime}, Base: {base}")
+
+    # Step 2: Alice generates her private key and public key
+    alice_private_key = generate_private_key(prime)
+    alice_public_key = compute_public_key(alice_private_key, base, prime)
+    print(f"Alice's Private Key: {alice_private_key}, Public Key: {alice_public_key}")
+
+    # Step 3: Bob generates his private key and public key
+    bob_private_key = generate_private_key(prime)
+    bob_public_key = compute_public_key(bob_private_key, base, prime)
+    print(f"Bob's Private Key: {bob_private_key}, Public Key: {bob_public_key}")
+
+    # Step 4: Alice and Bob compute the shared secret
+    alice_shared_secret = compute_shared_secret(bob_public_key, alice_private_key, prime)
+    bob_shared_secret = compute_shared_secret(alice_public_key, bob_private_key, prime)
+
+    print(f"Alice's Shared Secret: {alice_shared_secret}")
+    print(f"Bob's Shared Secret: {bob_shared_secret}")
+
+    # Verify that both shared secrets are equal
+    assert alice_shared_secret == bob_shared_secret, "Shared secrets do not match!"
+    print("Shared secret established successfully!")
